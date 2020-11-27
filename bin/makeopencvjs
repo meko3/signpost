@@ -1,0 +1,52 @@
+#!/bin/bash
+# Install git
+if [ -z "git --version" ]; then
+    echo "Installing: git"
+    brew install git
+fi
+echo -e "\033[32mInstalled:git\033[m"
+
+if [ -z "git --version" ]; then
+    echo "Installing: git"
+    brew install git
+fi
+echo -e "\033[32mInstalled:git\033[m"
+
+# make build dir
+if [ ! -d ~/custom ]; then
+    mkdir ~/custom
+fi
+if [ ! -d ~/custom/build ]; then
+    mkdir ~/custom/build
+fi
+echo -e "\033[32mBuildDir:~/custom/build\033[m"
+
+# Install opencv
+if [ ! -d ~/custom/build/opencv ]; then
+    git clone https://github.com/opencv/opencv.git ~/custom/build/opencv
+fi
+echo -e "\033[32mCloned:opencv\033[m"
+
+# install emsdk
+if [ ! -d ~/custom/build/emsdk ]; then
+    git clone https://github.com/juj/emsdk.git ~/custom/build/emsdk
+fi
+echo -e "\033[32mCloned:emsdk\033[m"
+
+# update emsdk
+if [ -d ~/custom/build/emsdk ]; then
+    cd ~/custom/build/emsdk
+    git pull
+    ./emsdk install latest
+    ./emsdk activate latest
+    source ./emsdk_env.sh
+fi
+echo -e "\033[32mUpdated:opencv\033[m"
+
+# make opencv.js
+cd ~/custom/build/opencv/
+python ./platforms/js/build_js.py build_js --emscripten ~/custom/build/emsdk/upstream/emscripten >> ~/custom/log.txt
+
+if [ -e ~/custom/build/opencv/build_js/bin/opencv.js ]; then
+    cp ~/custom/build/opencv/build_js/bin/opencv.js ~/custom/bin
+fi
